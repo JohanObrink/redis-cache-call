@@ -1,6 +1,6 @@
 {
   "name": "redis-cache-call",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A generic, higher order function for caching promise returning function calls",
   "main": "lib/cache-call",
   "scripts": {
