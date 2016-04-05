@@ -9,7 +9,7 @@ npm install redis-cache-call
 ```javascript
 // My redis config
 const config = {};
-const cacheCall = require('cacheCall')(config);
+const cacheCall = require('redis-cache-call')(config);
 
 function myAsyncFunction(foo, bar) {
   return new Promise((resolve, reject) => {
