@@ -1,0 +1,41 @@
+{
+  "name": "redis-cache-call",
+  "version": "0.0.0",
+  "description": "A generic, higher order function for caching promise returning function calls",
+  "main": "lib/cache-call",
+  "scripts": {
+    "test": "eslint ./lib/**/*.js ./test/**/*.js && mocha ./test/**/*.js",
+    "watch": "watch-run -i -p './lib/**/*.js,./test/**/*.js' npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohanObrink/redis-cache-call.git"
+  },
+  "keywords": [
+    "cache",
+    "higher",
+    "order",
+    "function",
+    "promise",
+    "redis"
+  ],
+  "author": "Johan Öbrink <johan.obrink@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JohanObrink/redis-cache-call/issues"
+  },
+  "homepage": "https://github.com/JohanObrink/redis-cache-call#readme",
+  "dependencies": {
+    "redis": "^2.6.0-1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^2.6.0",
+    "mocha": "^2.4.5",
+    "proxyquire": "^1.7.4",
+    "sinon": "^1.17.3",
+    "sinon-as-promised": "^4.0.0",
+    "sinon-chai": "^2.8.0",
+    "watch-run": "^1.2.4"
+  }
+}
