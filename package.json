@@ -1,6 +1,6 @@
 {
   "name": "redis-cache-call",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A generic, higher order function for caching promise returning function calls",
   "main": "lib/cache-call",
   "scripts": {
@@ -9,7 +9,7 @@
     "patch-release": "npm version patch && npm publish && git push origin master --follow-tags",
     "minor-release": "npm version minor && npm publish && git push origin master --follow-tags",
     "major-release": "npm version major && npm publish && git push origin master --follow-tags"
-    },
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JohanObrink/redis-cache-call.git"
