@@ -6,11 +6,19 @@ A generic, higher order function for caching promise returning function calls
 npm install redis-cache-call
 ```
 
+## Use
 ```javascript
 // My redis config
 const config = {};
-const cacheCall = require('redis-cache-call')(config);
+const redisCacheCall = require('redis-cache-call').init(config);
+const cacheCall = redisCacheCall.cacheCall;
+const cache = redisCacheCall.cache;
+```
 
+### .cacheCall
+Wraps a call in a caching mechanism so that a redis result is returned if it exists. Otherwise, the function calls through and the result is stored in redis.
+
+```javascript
 function myAsyncFunction(foo, bar) {
   return new Promise((resolve, reject) => {
     resolve({foo, bar});
@@ -23,22 +31,27 @@ const myCachedFunction = cacheCall('myAsyncFunction', 100, myAsyncFunction);
 myCachedFunction('foo', 'bar')
   .then(res => {
     // The result {foo: 'foo', bar: 'bar'} is stored in redis
-    // with the key myAsyncFunction|foo|bar
+    // with the key myAsyncFunction_[sha256 hash of arguments]
     // res == {foo: 'foo', bar: 'bar'}
 
     return myCachedFunction('foo', 'bar');
   })
   .then(res => {
     // The result {foo: 'foo', bar: 'bar'} is retrieved from redis
-    // with the key myAsyncFunction|foo|bar
+    // with the key myAsyncFunction_[sha256 hash of arguments]
     // res == {foo: 'foo', bar: 'bar'}
   });
 ```
 
-## Errors
+To use without expiration:
+```javascript
+const myCachedFunction = cacheCall('myAsyncFunction', myAsyncFunction);
+```
+
+#### Errors
 The cached functions will not return errors even if redis breaks.
 
-### Error events
+##### Error events
 To listen for errors, use:
 ```javascript
 cacheCall.on('error', err => {
@@ -50,12 +63,31 @@ myCachedFunction.on('error', err => {
 });
 ```
 
-### Fragile mode
+#### Fragile mode
 If you want the cachedCall to return an error if redis calls
 (get/set/expire) break:
 ```javascript
 const myFragileCachedFunction = cacheCall('myAsyncFunction', 100, myAsyncFunction, true);
 ```
+
+### .cache
+Caches or retrieves a result in/from redis
+
+```javascript
+// stores {my: {cached: 'result'}} with the key cache_[sha256 of ['myCacheKey']]
+// and a TTL of 100 seconds
+cache('myCacheKey', {my: {cached: 'result'}}, 100)
+  // and then retrieves it using the same key
+  .then(_ => cache('myCacheKey'));
+
+// If no cached result is found, null will be returned
+
+// Same operation without TTL
+cache('myCacheKey', {my: {cached: 'result'}})
+  .then(_ => cache('myCacheKey'));
+```
+
+Since cache doesn't have a function to call trough on, cache is fragile by default.
 
 # The MIT License (MIT)
 

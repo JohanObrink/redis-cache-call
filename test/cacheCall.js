@@ -7,7 +7,7 @@ const proxyquire = require('proxyquire');
 chai.use(require('sinon-chai'));
 require('sinon-as-promised');
 
-describe('cache-call', () => {
+describe('redis-cache-call.cacheCall', () => {
   let redis, client, config, func, cacheCall, cached, result, err;
   beforeEach(() => {
     config = {redis: 'config'};
@@ -28,23 +28,18 @@ describe('cache-call', () => {
     };
     func = sinon.stub().resolves(result);
 
-    cacheCall = proxyquire(process.cwd() + '/lib/cache-call', {
+    cacheCall = proxyquire(process.cwd() + '/lib/redis-cache-call', {
       'redis': redis
-    })(config);
+    }).init(config).cacheCall;
 
     cached = cacheCall('myFunc', 100, func);
-  });
-  it('creates a redis client using the correct config', () => {
-    expect(redis.createClient)
-      .calledOnce
-      .calledWith(config);
   });
   it('tries to read using the correct key', () => {
     return cached('hello', 'world')
       .then(() => {
         expect(client.get)
           .calledOnce
-          .calledWith('myFunc|hello|world');
+          .calledWith('myFunc_lL7bJvscuVR7W3eQLolSLzE8f3/i6fAXXPsKJEh47gc=');
       });
   });
   describe('cache exists', () => {
@@ -79,7 +74,7 @@ describe('cache-call', () => {
         .then(() => {
           expect(client.set)
             .calledOnce
-            .calledWith('myFunc|hello|world', JSON.stringify(result));
+            .calledWith('myFunc_lL7bJvscuVR7W3eQLolSLzE8f3/i6fAXXPsKJEh47gc=', JSON.stringify(result));
         });
     });
     it('sets the correct ttl', () => {
@@ -87,7 +82,18 @@ describe('cache-call', () => {
         .then(() => {
           expect(client.expire)
             .calledOnce
-            .calledWith('myFunc|hello|world', 100);
+            .calledWith('myFunc_lL7bJvscuVR7W3eQLolSLzE8f3/i6fAXXPsKJEh47gc=', 100);
+        });
+    });
+    it('does not set ttl if ttl is omitted', () => {
+      cached = cacheCall('myFunc', func);
+      return cached('hello', 'world')
+        .then(() => {
+          expect(client.set)
+            .calledOnce
+            .calledWith('myFunc_lL7bJvscuVR7W3eQLolSLzE8f3/i6fAXXPsKJEh47gc=', JSON.stringify(result));
+          expect(client.expire)
+            .not.called;
         });
     });
     it('returns the result', () => {
@@ -174,10 +180,17 @@ describe('cache-call', () => {
     });
   });
   describe('fragile', () => {
-    beforeEach(() => {
-      cached = cacheCall('myFunc', 100, func, true);
-    });
     it('fails if client.get returns an error', () => {
+      cached = cacheCall('myFunc', 100, func, true);
+      client.get.yields(err);
+      return cached('hello', 'world')
+        .then(r => Promise.reject(r))
+        .catch(error => {
+          expect(error).to.equal(err);
+        });
+    });
+    it('fails if client.get returns an error with no ttl', () => {
+      cached = cacheCall('myFunc', func, true);
       client.get.yields(err);
       return cached('hello', 'world')
         .then(r => Promise.reject(r))
@@ -186,6 +199,17 @@ describe('cache-call', () => {
         });
     });
     it('calls the function if client.set returns an error', () => {
+      cached = cacheCall('myFunc', 100, func, true);
+      client.get.yields();
+      client.set.yields(err);
+      return cached('hello', 'world')
+        .then(r => Promise.reject(r))
+        .catch(error => {
+          expect(error).to.equal(err);
+        });
+    });
+    it('calls the function if client.set returns an error with no ttl', () => {
+      cached = cacheCall('myFunc', func, true);
       client.get.yields();
       client.set.yields(err);
       return cached('hello', 'world')
@@ -195,6 +219,7 @@ describe('cache-call', () => {
         });
     });
     it('calls the function if client.expire returns an error', () => {
+      cached = cacheCall('myFunc', 100, func, true);
       client.get.yields();
       client.expire.yields(err);
       return cached('hello', 'world')
