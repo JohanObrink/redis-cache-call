@@ -2,7 +2,7 @@
   "name": "redis-cache-call",
   "version": "0.2.0",
   "description": "A generic, higher order function for caching promise returning function calls",
-  "main": "lib/cache-call",
+  "main": "lib/redis-cache-call",
   "scripts": {
     "test": "eslint ./lib/**/*.js ./test/**/*.js && mocha ./test/**/*.js",
     "watch": "watch-run -i -p './lib/**/*.js,./test/**/*.js' npm test",
