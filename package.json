@@ -4,8 +4,9 @@
   "description": "A generic, higher order function for caching promise returning function calls",
   "main": "lib/redis-cache-call",
   "scripts": {
-    "test": "eslint ./lib/**/*.js ./test/**/*.js && mocha ./test/**/*.js",
-    "watch": "watch-run -i -p './lib/**/*.js,./test/**/*.js' npm test",
+    "lint": "eslint ./gulpfile.js ./lib/**/*.js ./test/**/*.js",
+    "test": "mocha ./test/unit/**/*.js",
+    "test:integration": "mocha ./test/integration/**/*.js",
     "patch-release": "npm version patch && npm publish && git push origin master --follow-tags",
     "minor-release": "npm version minor && npm publish && git push origin master --follow-tags",
     "major-release": "npm version major && npm publish && git push origin master --follow-tags"
@@ -29,11 +30,17 @@
   },
   "homepage": "https://github.com/JohanObrink/redis-cache-call#readme",
   "dependencies": {
-    "redis": "^2.6.0-1"
+    "redis": "^2.6.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "eslint": "^2.7.0",
+    "eslint": "^3.5.0",
+    "eslint-config-standard": "^6.0.1",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-standard": "^2.0.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-mocha": "^3.0.1",
     "mocha": "^2.4.5",
     "proxyquire": "^1.7.4",
     "sinon": "^1.17.3",

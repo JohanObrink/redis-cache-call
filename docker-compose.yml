@@ -1,0 +1,12 @@
+api:
+  build: .
+  environment:
+    - 'PORT=4000'
+  ports:
+    - "4000:4000"
+  links:
+    - redis
+redis:
+  image: redis:3.2
+  ports:
+    - "6379:6379"

@@ -74,17 +74,17 @@ const myFragileCachedFunction = cacheCall('myAsyncFunction', 100, myAsyncFunctio
 Caches or retrieves a result in/from redis
 
 ```javascript
-// stores {my: {cached: 'result'}} with the key cache_[sha256 of ['myCacheKey']]
+// stores {my: {cached: 'result'}} with the key myCacheName_[sha256 of ['myCacheKey']]
 // and a TTL of 100 seconds
-cache('myCacheKey', {my: {cached: 'result'}}, 100)
+cache('myCacheName', 'myCacheKey', {my: {cached: 'result'}}, 100)
   // and then retrieves it using the same key
-  .then(_ => cache('myCacheKey'));
+  .then(_ => cache('myCacheName', 'myCacheKey'));
 
 // If no cached result is found, null will be returned
 
 // Same operation without TTL
-cache('myCacheKey', {my: {cached: 'result'}})
-  .then(_ => cache('myCacheKey'));
+cache('myCacheName', 'myCacheKey', {my: {cached: 'result'}})
+  .then(_ => cache('myCacheName', 'myCacheKey'));
 ```
 
 Since cache doesn't have a function to call trough on, cache is fragile by default.
